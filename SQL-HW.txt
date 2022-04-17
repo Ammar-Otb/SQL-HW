@@ -1,1 +1,81 @@
-test
+CREATE DATABASE store;
+use store;
+
+
+CREATE Table countries(
+    code int  PRIMARY KEY,
+    name VARCHAR(20), 
+    continent_name VARCHAR(20)
+);
+
+-- Ensure name is not null and continent name is UNIQUE
+ALTER Table countries MODIFY name VARCHAR(20) NOT NULL;
+ALTER TABLE countries ADD UNIQUE (continent_name);
+
+
+CREATE Table users(
+    id int  PRIMARY KEY,
+    full_name VARCHAR(20),
+    email VARCHAR(20),
+    gender CHAR(1),
+    date_of_birth VARCHAR(15),
+    created_at DATETIME,
+    country_code int
+);
+
+-- Make email unique, check if the gender entered is m or f, and add FOREIGN key
+ALTER TABLE users ADD UNIQUE (email);
+ALTER TABLE users ADD CHECK (gender= "m" or gender ="f");
+ALTER TABLE users ADD foreign key (country_code) references countries(code);
+
+
+
+CREATE Table orders(
+    id int PRIMARY KEY,
+    user_id int, 
+    status VARCHAR(6),
+    created_at DATETIME
+);
+
+-- Status check for start or finished and add FOREIGN key
+ALTER TABLE orders ADD CHECK (status= "start" or status = "finish");
+ALTER TABLE orders ADD foreign key (user_id) references users(id);
+
+
+create Table products(
+    id int PRIMARY KEY,
+    name VARCHAR(10),
+    price int DEFAULT 0,
+    status VARCHAR(10),
+    created_at DATETIME 
+);
+
+-- Make name not null, price default is 0, check if input for status is valid or expired, and lastly add a timestamp
+ALTER Table products MODIFY name VARCHAR(20) NOT NULL;
+ALTER Table products ALTER price SET default 0;
+ALTER Table products ADD check(status= "valid" or status = "expired");
+ALTER Table products ALTER created_at SET default CURRENT_TIMESTAMP();
+
+
+CREATE Table order_products(
+    order_id int,
+    product_id int,
+    quantity int,
+    PRIMARY KEY(order_id, product_id)
+);
+
+-- Set default quantity to 0 and add the FOREIGN keys 
+ALTER TABLE order_products ALTER quantity SET DEFAULT 0;
+ALTER Table order_products ADD foreign key(order_id) REFERENCES orders(id);
+ALTER Table order_products ADD foreign key(product_id) REFERENCES products(id);
+
+
+INSERT INTO countries VALUES(32, "Uganda", "Africa");
+INSERT INTO users VALUES(1, "Mohammed Avdol", "aMohammed@gmail.com", "m", "1997-09-04", "2020-03-03 11:23:45", 32);
+INSERT INTO orders VALUE(12,1, "start", "2022-05-09 10:04:54");
+INSERT into products VALUES(21, "Pen", 3, "valid","2021-10-12 08:23:21");
+INSERT into products VALUES(32, "Notebook", 6, "expired","2022-11-12 07:15:01");
+INSERT into order_products VALUES(12,21,105);
+
+UPDATE countries SET name="Egypt" where code = 32;
+DELETE FROM products where id = 32;
